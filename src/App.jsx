@@ -1,5 +1,4 @@
 import TextToSpeech from './components/TextToSpeech'
-
 function App() {
   return (
     <div className="min-h-screen bg-gray-900 py-8">

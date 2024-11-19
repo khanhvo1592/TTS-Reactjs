@@ -16,6 +16,7 @@ import { mockHistory } from '../mockData/historyData';
 import axios from 'axios';
 
 export default function TextToSpeech() {
+  const token = import.meta.env.VITE_VIETTEL_TOKEN;
   const [text, setText] = useState('');
   const [pitch, setPitch] = useState(1);
   const [rate, setRate] = useState(1);
@@ -35,6 +36,7 @@ export default function TextToSpeech() {
   const [voices, setVoices] = useState([]);
   const maxCharacters = 3000;
   const [totalCharactersUsed, setTotalCharactersUsed] = useState(0);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     document.documentElement.classList.add('dark', 'bg-gray-900');
@@ -89,14 +91,12 @@ export default function TextToSpeech() {
       return;
     }
 
-    setTotalCharactersUsed(prev => prev + text.length);
-
     const requestData = {
       text: text,
       voice: voice,
       speed: 1,
       tts_return_option: 3,
-      token: process.env.REACT_APP_VIETTEL_TOKEN,
+      token: import.meta.env.VITE_VIETTEL_TOKEN,
       without_filter: false,
     };
 
@@ -108,16 +108,16 @@ export default function TextToSpeech() {
         },
       });
 
-      const audioUrl = response.data.audio_url;
-      const audio = new Audio(audioUrl);
-      audio.play();
-      setIsPlaying(true);
-
-      audio.onended = () => {
-        setIsPlaying(false);
-      };
+      if (response.data.audio_url) {
+        const audioUrl = response.data.audio_url;
+        const audio = new Audio(audioUrl);
+        audio.play();
+      } else {
+        throw new Error('Không có URL âm thanh trong phản hồi');
+      }
     } catch (error) {
       console.error('Có lỗi xảy ra khi gọi API:', error);
+      alert('Không thể tạo giọng nói. Vui lòng thử lại.');
     }
   };
 
@@ -339,6 +339,10 @@ export default function TextToSpeech() {
           <div className="text-right text-sm mb-4 text-gray-400">
             Tổng số ký tự đã sử dụng: {totalCharactersUsed}
           </div>
+
+          {errorMessage && (
+            <div className="text-red-500 mb-4">{errorMessage}</div>
+          )}
 
           <div className="mb-6">
             <label className="block mb-2 text-gray-200">Voice</label>
