@@ -33,6 +33,8 @@ export default function TextToSpeech() {
   const itemsPerPage = 5;
   const [voice, setVoice] = useState('hcm-diemmy');
   const [voices, setVoices] = useState([]);
+  const maxCharacters = 3000;
+  const [totalCharactersUsed, setTotalCharactersUsed] = useState(0);
 
   useEffect(() => {
     document.documentElement.classList.add('dark', 'bg-gray-900');
@@ -86,6 +88,8 @@ export default function TextToSpeech() {
       alert('Vui lòng nhập văn bản trước khi phát âm');
       return;
     }
+
+    setTotalCharactersUsed(prev => prev + text.length);
 
     const requestData = {
       text: text,
@@ -325,11 +329,15 @@ export default function TextToSpeech() {
             placeholder="Nhập văn bản cần chuyển đổi..."
             value={text}
             onChange={(e) => setText(e.target.value)}
-            maxLength={500}
+            maxLength={maxCharacters}
           />
           
           <div className="text-right text-sm mb-4 text-gray-400">
-            {text.length}/500 ký tự
+            {text.length}/{maxCharacters} ký tự đã sử dụng trong lần tạo này
+          </div>
+
+          <div className="text-right text-sm mb-4 text-gray-400">
+            Tổng số ký tự đã sử dụng: {totalCharactersUsed}
           </div>
 
           <div className="mb-6">
@@ -387,6 +395,13 @@ export default function TextToSpeech() {
             </button>
             
             <button
+              onClick={handleSpeak}
+              className={`p-3 rounded-full ${isPlaying ? 'bg-blue-500 hover:bg-blue-600' : 'bg-blue-600 hover:bg-blue-700'} text-white transition-colors`}
+            >
+              <PlayArrowIcon />
+            </button>
+
+            <button
               onClick={handleDownload}
               className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 
                          text-white rounded-lg transition-colors"
@@ -396,29 +411,7 @@ export default function TextToSpeech() {
             </button>
           </div>
 
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <button className="p-2 rounded-full bg-gray-700/50 hover:bg-gray-600 text-gray-300 transition-colors">
-              <SkipPreviousIcon />
-            </button>
-            <button
-              className={`p-3 rounded-full ${
-                isPlaying ? 'bg-blue-500 hover:bg-blue-600' : 'bg-blue-600 hover:bg-blue-700'
-              } text-white transition-colors`}
-              onClick={handleSpeak}
-            >
-              {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
-            </button>
-            <button
-              className="p-2 rounded-full bg-gray-700/50 hover:bg-gray-600 text-gray-300 transition-colors"
-              onClick={handleStop}
-            >
-              <StopIcon />
-            </button>
-            <button className="p-2 rounded-full bg-gray-700/50 hover:bg-gray-600 text-gray-300 transition-colors">
-              <SkipNextIcon />
-            </button>
-          </div>
-
+        
           <div className="flex justify-between text-sm text-gray-400">
             <span className="text-green-400">Connected</span>
             <span className="text-green-400">Số ký tự đã sử dụng: {text.length}</span>
