@@ -13,6 +13,7 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import ConvertIcon from '@mui/icons-material/Transform';
 import { mockHistory } from '../mockData/historyData';
+import axios from 'axios';
 
 export default function TextToSpeech() {
   const [text, setText] = useState('');
@@ -30,6 +31,8 @@ export default function TextToSpeech() {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+  const [voice, setVoice] = useState('hcm-diemmy');
+  const [voices, setVoices] = useState([]);
 
   useEffect(() => {
     document.documentElement.classList.add('dark', 'bg-gray-900');
@@ -65,21 +68,53 @@ export default function TextToSpeech() {
     }
   }, []);
 
-  const handleSpeak = () => {
-    if (isPlaying) {
-      speechSynthesis.pause();
-    } else {
-      if (speechSynthesis.paused) {
-        speechSynthesis.resume();
-      } else {
-        utteranceRef.current = new SpeechSynthesisUtterance(text);
-        utteranceRef.current.pitch = pitch;
-        utteranceRef.current.rate = rate;
-        utteranceRef.current.volume = volume;
-        speechSynthesis.speak(utteranceRef.current);
+  useEffect(() => {
+    const fetchVoices = async () => {
+      try {
+        const response = await import('../data/voices.json');
+        setVoices(response.default);
+      } catch (error) {
+        console.error('Có lỗi xảy ra khi tải danh sách giọng nói:', error);
       }
+    };
+
+    fetchVoices();
+  }, []);
+
+  const handleSpeak = async () => {
+    if (!text) {
+      alert('Vui lòng nhập văn bản trước khi phát âm');
+      return;
     }
-    setIsPlaying(!isPlaying);
+
+    const requestData = {
+      text: text,
+      voice: voice,
+      speed: 1,
+      tts_return_option: 3,
+      token: process.env.REACT_APP_VIETTEL_TOKEN,
+      without_filter: false,
+    };
+
+    try {
+      const response = await axios.post('https://viettelai.vn/tts/speech_synthesis', requestData, {
+        headers: {
+          'accept': '*/*',
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const audioUrl = response.data.audio_url;
+      const audio = new Audio(audioUrl);
+      audio.play();
+      setIsPlaying(true);
+
+      audio.onended = () => {
+        setIsPlaying(false);
+      };
+    } catch (error) {
+      console.error('Có lỗi xảy ra khi gọi API:', error);
+    }
   };
 
   const handleStop = () => {
@@ -300,8 +335,12 @@ export default function TextToSpeech() {
           <div className="mb-6">
             <label className="block mb-2 text-gray-200">Voice</label>
             <select className="w-full p-2 bg-gray-700/50 border border-gray-600 rounded-lg 
-                              text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option>Default Voice</option>
+                              text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={voice}
+                    onChange={(e) => setVoice(e.target.value)}>
+              {voices.map((v) => (
+                <option key={v.code} value={v.code}>{v.name}</option>
+              ))}
             </select>
           </div>
 

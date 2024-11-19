@@ -1,0 +1,18 @@
+[
+    { "name": "Băng Tâm", "code": "hcm-diemmy" },
+    { "name": "Quỳnh Anh", "code": "hn-quynhanh" },
+    { "name": "Mai Ngọc", "code": "hue-maingoc" },
+    { "name": "Phương Trang", "code": "hn-phuongtrang" },
+    { "name": "Thảo Chi", "code": "hn-thaochi" },
+    { "name": "Thanh Hà", "code": "hn-thanhha" },
+    { "name": "Ngọc Hương", "code": "hcm-phuongly" },
+    { "name": "Mỹ Hảo", "code": "hcm-thuydung" },
+    { "name": "Thanh Tùng", "code": "hn-thanhtung" },
+    { "name": "Bảo Quốc", "code": "hue-baoquoc" },
+    { "name": "Minh Quân", "code": "hcm-minhquan" },
+    { "name": "Thanh Phương", "code": "hn-thanhphuong" },
+    { "name": "Nam Khánh", "code": "hn-namkhanh" },
+    { "name": "Thu Thảo", "code": "hn-leyen" },
+    { "name": "Tiến Quân", "code": "hn-tienquan" },
+    { "name": "Thùy Duyên", "code": "hcm-thuyduyen" }
+  ]
